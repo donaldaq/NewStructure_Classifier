@@ -1,0 +1,110 @@
+# KONGLISH ::::::::::::::::::
+# 
+
+# [Cuda number selection]
+
+cuda_number: '0'
+
+
+# [Model Configuration]
+# you can choose model architecture and learning type
+#
+# arch : DenseNet161, InceptionResNetV2, ResNet152, EfficientNet, NASNetALarge, Transformer, 
+#        ECAResNet101, ResumeModel
+# params : 
+# - pretrained : 'True' is to use pretrained model
+# resume : 'True' is to resume to learn for previous model
+# load_model_name : want to load model file name
+# save_dir : save directory name for log, tensorboard, and model
+# data_dir : load dataset folder
+# summary: Model Summary(like keras)
+model:
+    arch: 'DenseNet161'
+    params:
+        pretrained: False
+    resume: False
+    load_model_name: '' # ex) resnet50_val_loss[0.0444].pth.tar'
+    data_dir: '/home/huray/workspace/data/food_sample_0419/7'
+    save_dir: 'food_bin_7_0419'
+    fixed: False
+    summary: True
+    balanced_class: False
+
+dataset: 'imagefolder'    
+# [Device Configuration]
+# 
+# n_workers : when loading the dataset, number of multi-threads
+# batch_size: decide batch size
+device:
+    n_workers: 4
+
+# [Model Hyper Parameters Configuration]
+# epoch : number of iteration for learning the model
+# batch_size : size of data for each learning process 
+# loss : 
+# - name : loss name(ex - binary_cross_entropy)
+# - params : loss parameters
+# optimizer : gradient update function
+# - name : optimizer name(ex - adam, sgd, etc)
+# - params : optimizer parameters(ex - lr, weight_decay)
+# scheduler : scheduling optimizer
+# - name : scheduler name
+# - params : scheduler parameters
+hyper_params:
+    epoch: 300
+    batch_size: 8
+    loss:
+        name: binary_cross_dice
+        params:
+    optimizer:
+        name: Adam
+        params:
+            lr: 1e-3
+            weight_decay: 1e-5
+    scheduler:
+        use: True
+        name: WarmupCosineAnnealing
+        params:
+            mode: 'min'
+            factor: 0.1
+            patience: 10
+            min_lr: 1e-10
+            verbose: True
+
+# [Augmentation Configuration]
+# train : augmentations for train and valid dataset
+# test : augmentations for train dataset
+augmentations:
+    train:
+        resize: 224
+        #color_jitter: [0.2, 0.5]
+        #random_rotation: 5
+        #hflip:
+        to_tensor:
+    test:
+        resize: 512
+        to_tensor:
+
+# [Callback Functions Configuration]
+# early_stop : 
+# - use : whether or not to use Ealry stop function
+# - monitor : [val_acc, loss, val_loss, auroc]
+# - patience : 
+# checkpoint : information for model, optimizer, scheduler, etc 
+# - monitor : [val_acc, loss, val_loss, auroc]
+# - verbose : 
+# - save_best_only : save the model that have the best monitor value only
+# writer : record metrics by Tensorboard
+# - use : whether or not to use Tensorboard
+early_stop:
+    control: True
+    startnumber: 50
+    patiencenumber: 50
+
+checkpoint:
+    monitor: 'val_loss'
+    verbose: 1
+    save_best_only: True
+
+writer:
+    use: True

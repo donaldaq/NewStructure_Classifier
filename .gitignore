@@ -1,0 +1,8 @@
+!data/.gitkeep
+!log/.gitkeep
+!learned_models/.gitkeep
+
+
+learned_models/*
+data/*
+log/*

@@ -46,6 +46,12 @@ import utils.balanced_classes as balanced_classes
 # ImageNet Policy
 from utils.autoaugment import ImageNetPolicy
 
+# model load 
+import models.model_selector
+
+# optimizer load
+import optimizer.optimizer_selector
+
 # yaml for configuration
 import yaml
 ymlfile = sys.argv[1]
@@ -61,6 +67,7 @@ with open(yml_path, 'r') as stream:
 
 result_path = 'results'
 result_file_path = os.path.join(result_path, '{}_{}_{}_train_results.txt'.format(date, cfg['model']['arch'], cfg['model']['save_dir']))
+
 
 result_report = open(result_file_path, 'w', encoding='utf_8')
 
@@ -98,6 +105,7 @@ print('-----------hyper parameter summary-----------')
 print('epoch number: ', cfg['hyper_params']['epoch'])
 print('batch size: ',cfg['hyper_params']['batch_size'])
 print('learning rate: ', cfg['hyper_params']['optimizer']['params']['lr'])
+print('optimizer: ', cfg['hyper_params']['optimizer']['name'])
 
 print('---------earlystop summary--------')
 print('control: ', cfg['early_stop']['control'])
@@ -134,7 +142,7 @@ val_acc = []
 
 
 #Train the model
-def train_model(model, criterion, optimizer, scheduler, num_epochs, dataloaders, dataloaders_val):
+def train_model(model, criterion, optimizer, scheduler, dataloaders, dataloaders_val, dataset_sizes, model_name, num_epochs):
     since = time.time()
     #Initialize Values
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -243,16 +251,16 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs, dataloaders,
                 best_epoch = epoch
                 best_model_wts = copy.deepcopy(model.state_dict())
                 if torch.cuda.device_count() == 1:
-                    torch.save(model, "./models/{}/{}_best.pth".format(save_dir,model_name))
-                    torch.save(model.state_dict(), "./models/{}/{}_best_state.pth".format(save_dir,model_name))
+                    torch.save(model, "./learned_models/{}/{}_best.pth".format(save_dir,model_name))
+                    torch.save(model.state_dict(), "./learned_models/{}/{}_best_state.pth".format(save_dir,model_name))
                 else:
-                    torch.save(model.module.state_dict(), "./models/{}/{}_best.pth".format(save_dir,model_name))
+                    torch.save(model.module.state_dict(), "./learned_models/{}/{}_best.pth".format(save_dir,model_name))
                 print("Best model epoch number check: {}".format(epoch))
             if epoch % 10 == 0:
                 if torch.cuda.device_count() == 1:
-                    torch.save(model, "./models/{}/{}_{}.pth".format(save_dir,model_name,epoch))
+                    torch.save(model, "./learned_models/{}/{}_{}.pth".format(save_dir,model_name,epoch))
                 else:
-                    torch.save(model.module.state_dict(), "./models/{}/{}_{}.pth".format(save_dir,model_name,epoch))
+                    torch.save(model.module.state_dict(), "./learned_models/{}/{}_{}.pth".format(save_dir,model_name,epoch))
 
         writer.add_scalar("Loss/train", epoch_loss)
         writer.add_scalar("Accuracy/train", epoch_acc)
@@ -316,13 +324,17 @@ print('cuda available check :', torch.cuda.is_available())
 
 
 if __name__ == "__main__":
-    transforms = image_transforms.get_transforms()
-    imgdataloader = ImageDataLoader(cfg)
 
+    transforms = image_transforms.get_transforms()
+    imgdataloader = ImageDataLoader.ImageDataLoader(cfg)
     datasetsize = imgdataloader.getter_datasetsize()
     classnames = imgdataloader.getter_classnames()
+    dataloaders, dataloaders_val = imgdataloader.getter_dataloaders()
+
+    optimName = cfg['hyper_params']['optimizer']['name']
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    model_ft = models.model_selector.model_selector(cfg['model']['arch'], classnames, cfg['early_stop']['control'], device)
 
     if torch.cuda.device_count() > 1:
         model_ft = nn.DataParallel(model_ft)
@@ -330,12 +342,16 @@ if __name__ == "__main__":
     model_Parallel = model_ft.__class__.__name__
     print('model parallel check: '+ model_Parallel)
 
-    scheduler.scheduler_selector.scheduler_selector(model_ft,optimizer_ft,optimName)
+    optimizer_ft = optimizer.optimizer_selector.optimizer_selector(model_ft, cfg['hyper_params']['optimizer']['params']['lr'],optimName) 
+
+    exp_lr_scheduler = scheduler.scheduler_selector.scheduler_selector(model_ft,optimizer_ft,cfg['hyper_params']['scheduler']['name'])
+
+    criterion = nn.CrossEntropyLoss()
 
     ### Summary model contents
     #summary(model_ft, (3, 480, 720))
 
-    model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
+    model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, dataloaders_val, datasetsize, cfg['model']['arch'],
                        num_epochs=cfg['hyper_params']['epoch'])
 
     result_report.close()

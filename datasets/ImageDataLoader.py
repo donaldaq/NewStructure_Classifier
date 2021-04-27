@@ -27,7 +27,7 @@ class ImageDataLoader():
         self.batch_size_control = int(cfg['hyper_params']['batch_size'])
  
         if cfg['dataset'] == "imagefolder":
-            self.image_datasets = datasets.ImageFolderDataSet()
+            self.image_datasets = datasets.ImageFolderDataSet(cfg)
         elif cfg['dataset'] == "customdataset":
             self.image_datasets = customdatasets.CustomDataset()
         # Called dataset class
@@ -44,18 +44,18 @@ class ImageDataLoader():
                             for x in ['train']}
         else:
             for mode in ['train']:
-                dataloaders = {x: data.DataLoader(self.image_datasets[x], shuffle = True, batch_size=self.batch_size_control,
+                self.dataloaders = {x: data.DataLoader(self.image_datasets.image_datasets[x], shuffle = True, batch_size=self.batch_size_control,
                                                     num_workers=4)
                             for x in ['train']}
 
         for mode in ['val','test']:
-            dataloaders_val = {x: data.DataLoader(self.image_datasets[x], batch_size=self.batch_size_control,
+            self.dataloaders_val = {x: data.DataLoader(self.image_datasets.image_datasets[x], batch_size=self.batch_size_control,
                                                 shuffle=True, num_workers=4)
                     for x in ['val','test']}
 
 
-        self.dataset_sizes = {x: len(self.image_datasets[x]) for x in ['train', 'val', 'test']}
-        self.class_names = self.image_datasets['train'].classes
+        self.dataset_sizes = {x: len(self.image_datasets.image_datasets[x]) for x in ['train', 'val', 'test']}
+        self.class_names = self.image_datasets.image_datasets['train'].classes
 
 
 
@@ -68,3 +68,6 @@ class ImageDataLoader():
     
     def getter_classnames(self):
         return self.class_names
+
+    def getter_dataloaders(self):
+        return self.dataloaders, self.dataloaders_val

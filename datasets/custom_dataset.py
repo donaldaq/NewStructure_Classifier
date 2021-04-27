@@ -10,7 +10,7 @@ import torch
 from torch.utils import data
 from torchvision import datasets, models, transforms
 from datetime import datetime
-import transforms.img_transforms
+import image_transforms.img_transforms
 from PIL import Image as PIL
 from tqdm import tqdm
 
