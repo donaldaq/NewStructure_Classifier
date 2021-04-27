@@ -317,6 +317,8 @@ def train_model(model, criterion, optimizer, scheduler, dataloaders, dataloaders
 
     print('Training complete in {:.0f}m {:.0f}s'.format(
         time_elapsed // 60, time_elapsed % 60), file=result_report)
+    print('-' * 10, file=result_report)
+    print('-' * 10, file=result_report)
     print('Best val Acc: {:4f}, epoch number: {}'.format(best_acc, best_epoch), file=result_report)
 
     result_report.close()
