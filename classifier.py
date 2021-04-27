@@ -75,10 +75,10 @@ with open(yml_path, 'r') as stream:
     cfg = yaml.safe_load(stream)
 
 result_path = 'results'
+global result_file_path
 result_file_path = os.path.join(result_path, '{}_{}_{}_train_results.txt'.format(date, cfg['model']['arch'], cfg['model']['save_dir']))
+global result_report
 result_report = open(result_file_path, 'w', encoding='utf_8')
-
-
 
 ############## Check Training Information ##############
 print('-----------check summary-----------', file=result_report)
@@ -102,6 +102,7 @@ print('---------earlystop summary--------', file=result_report)
 print('control: ', cfg['early_stop']['control'], file=result_report)
 print('start point: ', cfg['early_stop']['startnumber'], file=result_report)
 print('patince number: ', cfg['early_stop']['patiencenumber'], file=result_report)
+
 
 
 ######################### Print Setting Parameter ###########################################
@@ -159,7 +160,7 @@ val_acc = []
 ### Cuda Device Check 
 print('cuda device count check: ', torch.cuda.device_count())
 print('cuda available check :', torch.cuda.is_available())
-
+result_report.close()
 
 #Train the model
 def train_model(model, criterion, optimizer, scheduler, dataloaders, dataloaders_val, dataset_sizes, model_name, num_epochs):
@@ -188,6 +189,7 @@ def train_model(model, criterion, optimizer, scheduler, dataloaders, dataloaders
 
      # initialize the early_stopping object
     early_stopping = EarlyStopping(patience=earlystop_patiencenumber, verbose=True)
+
 
     for epoch in range(num_epochs):
         epoch = epoch + 1
@@ -361,5 +363,7 @@ if __name__ == "__main__":
     ### Training 
     model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, dataloaders_val, datasetsize, cfg['model']['arch'],
                        num_epochs=cfg['hyper_params']['epoch'])
+
+    
 
     make_Report(save_dir, cfg['model']['arch'],epoch_counter_train,train_loss,epoch_counter_val,val_loss, train_acc,val_acc)
