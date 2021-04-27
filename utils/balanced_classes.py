@@ -3,7 +3,17 @@
 
 '''
 # parameter: imagedataset image, length of image dataset classes  
-def make_weights_for_balanced_classes(images, nclasses):                        
+def make_weights_for_balanced_classes(images, nclasses):
+    """ make weight balanced classes
+
+    Args:
+        images (Object): Each of images
+        nclasses (Integer): number of classes
+
+    Returns:
+        [type]: [description]
+    """
+
     print("balanced classes set")
     count = [0] * nclasses
     for item in images:                                                         

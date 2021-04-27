@@ -1,0 +1,19 @@
+-----------check summary-----------
+cuda number:  0
+model name:  DenseNet161
+use pretrained model:  False
+dataset:  /home/huray/workspace/data/food_sample_0419/7
+save_dir:  food_bin_7_0419
+using fixed pretrained model parameter:  False
+balaced classes control:  False
+-----------hyper parameter summary-----------
+epoch number:  2
+batch size:  8
+learning rate:  1e-3
+optimizer:  Adam
+loss:  CrossEntropyLoss
+image resize:  224
+---------earlystop summary--------
+control:  True
+start point:  50
+patince number:  50

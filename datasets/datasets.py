@@ -24,6 +24,11 @@ from utils.autoaugment import ImageNetPolicy
 class ImageFolderDataSet():
     
     def __init__(self, cfg):
+        """ PyTorch ImageFolder Dataset Initialization
+
+        Args:
+            cfg (Object): Configuration of Yaml for Learning
+        """
 
         self.date = datetime.today().strftime("%-y%m%d")
 
@@ -33,7 +38,7 @@ class ImageFolderDataSet():
         self.batch_size_control = int(cfg['hyper_params']['batch_size'])
 
         #transforms = img_transforms()
-        transforms = image_transforms.get_transforms()
+        transforms = image_transforms.get_transforms(cfg['augmentations']['train']['resize'])
 
         self.image_datasets = {x: datasets.ImageFolder(os.path.join(self.data_dir, x), transforms[x])
                     for x in ['train', 'val', 'test']}

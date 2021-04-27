@@ -3,6 +3,12 @@ from torch.optim import lr_scheduler
 
 def scheduler_selector(model_ft,optimizer_ft,optimName):
 
+    """ Set Scheduler
+
+    Returns:
+        [Object]: Learning Scheduler
+    """
+
 
     if optimName == "StepLR":
         ## Decay LR by a factor of 0.1 every 10 epochs
@@ -17,21 +23,6 @@ def scheduler_selector(model_ft,optimizer_ft,optimName):
         None
 
     return exp_lr_scheduler
-
-
-
-    
-        
-
-
-
-## Using Adam as the parameter optimizer
-
-#
-
-### Selection schedulers
-
-
 
 
 

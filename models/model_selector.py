@@ -9,6 +9,17 @@ import timm
 from efficientnet_pytorch import EfficientNet
 
 def model_selector(modelName, class_names, use_fixed, device):
+    """ Set Deep Learning Model
+
+    Args:
+        modelName (String): Model Name
+        class_names (String): Class Name
+        use_fixed (Boolean): Select fixed weight in Neural Network
+        device (Integer): Device Number
+
+    Returns:
+        [type]: [description]
+    """
     if modelName == 'DenseNet161':
         model_ft = models.densenet161(pretrained=True)
     elif modelName == 'InceptionResNetV2':
@@ -32,6 +43,18 @@ def model_selector(modelName, class_names, use_fixed, device):
 
 
 def model_settings(model_ft, model_name, use_fixed, class_names, device):
+    """ Set Model Settings
+
+    Args:
+        model_ft (Object): Pretrained Model
+        model_name (String): Model name
+        use_fixed (Boolean): Select fixed weight in Neural Network
+        class_names (String): Class name for Counting class
+        device (Integer): Device Number
+
+    Returns:
+        [Object]: Pretrained Model
+    """
     # Using a model pre-trained on ImageNet and replacing it's final linear layer
     if use_fixed == True:
         for param in model_ft.parameters():

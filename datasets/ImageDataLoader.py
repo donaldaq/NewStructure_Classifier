@@ -23,8 +23,13 @@ import utils.balanced_classes as balanced_classes_weight
 class ImageDataLoader():
     
     def __init__(self, cfg):
+        """ ImageDataset Loader Initialization 
+
+        Args:
+            cfg (Object): Configuration of Yaml for Learning
+        """
         self.date = datetime.today().strftime("%-y%m%d")
-        self.batch_size_control = int(cfg['hyper_params']['batch_size'])
+        self.batch_size = int(cfg['hyper_params']['batch_size'])
  
         if cfg['dataset'] == "imagefolder":
             self.image_datasets = datasets.ImageFolderDataSet(cfg)
@@ -39,17 +44,17 @@ class ImageDataLoader():
             self.sampler = data.sampler.WeightedRandomSampler(self.weights, len(self.weights))
             
             for mode in ['train']:
-                self.dataloaders = {x: data.DataLoader(self.image_datasets[x], shuffle = False,sampler=self.sampler, batch_size=self.batch_size_control,
+                self.dataloaders = {x: data.DataLoader(self.image_datasets[x], shuffle = False,sampler=self.sampler, batch_size=self.batch_size,
                                                     num_workers=4)
                             for x in ['train']}
         else:
             for mode in ['train']:
-                self.dataloaders = {x: data.DataLoader(self.image_datasets.image_datasets[x], shuffle = True, batch_size=self.batch_size_control,
+                self.dataloaders = {x: data.DataLoader(self.image_datasets.image_datasets[x], shuffle = True, batch_size=self.batch_size,
                                                     num_workers=4)
                             for x in ['train']}
 
         for mode in ['val','test']:
-            self.dataloaders_val = {x: data.DataLoader(self.image_datasets.image_datasets[x], batch_size=self.batch_size_control,
+            self.dataloaders_val = {x: data.DataLoader(self.image_datasets.image_datasets[x], batch_size=self.batch_size,
                                                 shuffle=True, num_workers=4)
                     for x in ['val','test']}
 
@@ -64,10 +69,13 @@ class ImageDataLoader():
         return len(self.dataset_sizes)
 
     def getter_datasetsize(self):
+        """Return Dataset sizes."""
         return self.dataset_sizes
     
     def getter_classnames(self):
+        """Return class names."""
         return self.class_names
 
     def getter_dataloaders(self):
+        """Return Data Loaders"""
         return self.dataloaders, self.dataloaders_val

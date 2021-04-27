@@ -51,10 +51,10 @@ device:
 # - name : scheduler name
 # - params : scheduler parameters
 hyper_params:
-    epoch: 300
+    epoch: 2
     batch_size: 8
     loss:
-        name: binary_cross_dice
+        name: CrossEntropyLoss
         params:
     optimizer:
         name: Adam

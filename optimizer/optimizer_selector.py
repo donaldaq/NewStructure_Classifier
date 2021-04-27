@@ -1,6 +1,16 @@
 import torch.optim as optim
 
 def optimizer_selector(model_ft, lr, optimName):
+    """ Select Optimizer
+
+    Args:
+        model_ft (Object): Pretrained Model
+        lr (String): Learning rates (it should be cast to float)
+        optimName (String): Optimizer Name
+
+    Returns:
+        [Object]: Optimizer
+    """
     if optimName == "SGD":
         optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
     elif optimName == "Adam":

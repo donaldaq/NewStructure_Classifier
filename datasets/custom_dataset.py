@@ -22,8 +22,18 @@ from utils.autoaugment import ImageNetPolicy
 
 
 class CustomDataset(data.Dataset):
+    """ Custom Dataset
+
+    Args:
+        data (Object): Declaration Dataset
+    """
     def __init__(self, root_dir, transforms=None):
-        
+        """ initialization 
+
+        Args:
+            root_dir (String): Set Dataset
+            transforms (Object, optional): [Declaration Transforms]. Defaults to None.
+        """
         def regular_ext(extension):
             return '*.' + ''.join('[%s%s]' % (e.lower(), e.upper()) for e in extension)
 
@@ -43,6 +53,14 @@ class CustomDataset(data.Dataset):
 
 
     def __getitem__(self, idx):
+        """ get index image
+
+        Args:
+            idx (Integer): Number of Index
+
+        Returns:
+            [Dictionary]: Image Information
+        """
         img_path, label = self.data[idx], self.labels[idx]
         img = PIL.Image.open(img_path)
 
@@ -53,4 +71,9 @@ class CustomDataset(data.Dataset):
         return sample
     
     def __len__(self):
+        """ Dataset Length
+
+        Returns:
+            [Integer]: Number of Dataset Length
+        """
         return len(self.data)
